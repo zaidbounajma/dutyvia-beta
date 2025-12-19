@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "dutyfree-app",
+    "slug": "dutyfree-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "entryPoint": "./App.js",
+    "platforms": ["ios", "android", "web"]
+  }
+}

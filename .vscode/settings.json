@@ -1,0 +1,17 @@
+{
+  // Turn Deno ON only for the edge functions folder (so React stays Node)
+  "deno.enable": true,
+  "deno.enablePaths": ["supabase/functions"],
+  "deno.unstable": true,
+  "deno.lint": true,
+
+  // Use our import map
+  "deno.importMap": "./deno.json",
+
+  // Allow these hosts for auto-imports
+  "deno.suggest.imports.hosts": {
+    "jsr": true,
+    "npm:": true,
+    "https://esm.sh": true
+  }
+}
