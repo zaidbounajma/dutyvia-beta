@@ -1,7 +1,15 @@
-// src/screens/App.jsx
+// src/App.jsx
 import React from "react";
-import AppAuth from "./AppAuth.jsx";
+import AppAuth from "./screens/AppAuth.jsx";
+import { AuthProvider } from "./auth/AuthContext.jsx";
+import CartProvider from "./context/CartContext.jsx";
 
 export default function App() {
-  return <AppAuth />;
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <AppAuth />
+      </CartProvider>
+    </AuthProvider>
+  );
 }

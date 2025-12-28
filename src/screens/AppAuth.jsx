@@ -1,3 +1,10 @@
+import { useAuth } from "../auth/AuthContext.jsx";
+import SignInUp from "../auth/SignInUp.jsx";
+const { user, loading } = useAuth();
+
+if (loading) return <div style={{ padding: 18, color: "white" }}>Chargement…</div>;
+if (!user) return <SignInUp />;
+
 // src/screens/AppAuth.jsx
 import React, { useEffect, useMemo, useState } from "react";
 

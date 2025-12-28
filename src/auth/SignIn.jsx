@@ -1,149 +1,121 @@
-import { useState } from "react";
+// src/auth/SignIn.jsx
+import React, { useState } from "react";
 import { useAuth } from "./AuthContext.jsx";
 
 export default function SignIn() {
-  const { signIn, signUp } = useAuth();
+  const { signInWithEmail } = useAuth();
 
-  const [email, setEmail] = useState("demo@dutyfree.test");
-  const [password, setPassword] = useState("demo1234");
-
-  const [mode, setMode] = useState("signin"); // "signin" | "signup"
-  const [errorMsg, setErrorMsg] = useState("");
-  const [okMsg, setOkMsg] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
 
-  async function handleSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
-    setOkMsg("");
+    setErr("");
+    setMsg("");
 
     try {
-      if (mode === "signin") {
-        // tentative login
-        await signIn(email, password);
-        setOkMsg("Connexion réussie ✅");
-      } else {
-        // tentative création compte
-        const resSignup = await signUp(email, password);
-
-        // Après signup, on tente direct de se connecter
-        try {
-          await signIn(email, password);
-          setOkMsg(
-            "Compte créé (ou déjà existant) et connecté ✅"
-          );
-        } catch (err2) {
-          // si login refuse (ex: email doit être confirmé)
-          console.warn("[SignIn] signIn after signUp failed:", err2);
-          setOkMsg(
-            "Compte créé. Vérifie ton email si confirmation requise."
-          );
-        }
-      }
-    } catch (err) {
-      console.error("[SignIn] error:", err);
-      setErrorMsg(err.message || "Erreur d'authentification");
+      setLoading(true);
+      await signInWithEmail(email);
+      setMsg("✅ Lien envoyé ! Ouvre ton email et clique sur le lien pour te connecter.");
+    } catch (e2) {
+      console.error("SignIn error:", e2);
+      setErr(e2?.message || "Impossible d’envoyer le lien. Réessaie.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="max-w-xs w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-white shadow-xl shadow-black/40">
-      <div className="text-center mb-4">
-        <div className="text-white font-semibold text-lg">
-          DutyFree
-        </div>
-        <div className="text-[12px] text-gray-400 leading-relaxed">
-          {mode === "signin"
-            ? "Connecte-toi pour continuer"
-            : "Crée ton compte"}
-        </div>
+    <div
+      style={{
+        maxWidth: 420,
+        margin: "40px auto",
+        padding: 16,
+        borderRadius: 16,
+        border: "1px solid rgba(255,255,255,0.10)",
+        background: "rgba(0,0,0,0.45)",
+        color: "rgba(255,255,255,0.92)",
+      }}
+    >
+      <div style={{ fontSize: 18, fontWeight: 950 }}>DutyFree</div>
+      <div style={{ opacity: 0.85, fontSize: 13, marginTop: 6 }}>
+        Connecte-toi pour continuer
       </div>
 
-      {errorMsg && (
-        <div className="bg-red-600/20 border border-red-600/40 rounded-lg p-2 text-[12px] text-red-300 mb-3 whitespace-pre-wrap">
-          {errorMsg}
-        </div>
-      )}
+      <form onSubmit={onSubmit} style={{ marginTop: 14 }}>
+        <label style={{ display: "block", fontSize: 12, opacity: 0.8 }}>
+          Email
+        </label>
+        <input
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="ex: prenom.nom@gmail.com"
+          style={{
+            width: "100%",
+            marginTop: 6,
+            padding: "10px 12px",
+            borderRadius: 12,
+            border: "1px solid rgba(255,255,255,0.12)",
+            background: "rgba(255,255,255,0.06)",
+            color: "rgba(255,255,255,0.92)",
+            outline: "none",
+          }}
+        />
 
-      {okMsg && (
-        <div className="bg-green-600/20 border border-green-600/40 rounded-lg p-2 text-[12px] text-green-300 mb-3 whitespace-pre-wrap">
-          {okMsg}
-        </div>
-      )}
-
-      <form className="flex flex-col gap-3 text-[13px]" onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-1">
-          <label className="text-[12px] text-gray-300">Email</label>
-          <input
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-[13px] outline-none focus:ring-2 focus:ring-blue-600/50"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-            required
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[12px] text-gray-300">Mot de passe</label>
-          <input
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-[13px] outline-none focus:ring-2 focus:ring-blue-600/50"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <div className="text-[11px] text-gray-500 leading-relaxed">
-            Min 6 caractères.
+        {err ? (
+          <div
+            style={{
+              marginTop: 10,
+              padding: "10px 12px",
+              borderRadius: 12,
+              border: "1px solid rgba(248,113,113,0.35)",
+              background: "rgba(248,113,113,0.10)",
+              color: "#fecaca",
+              fontSize: 12,
+            }}
+          >
+            ❌ {err}
           </div>
-        </div>
+        ) : null}
+
+        {msg ? (
+          <div
+            style={{
+              marginTop: 10,
+              padding: "10px 12px",
+              borderRadius: 12,
+              border: "1px solid rgba(34,197,94,0.35)",
+              background: "rgba(34,197,94,0.10)",
+              color: "#bbf7d0",
+              fontSize: 12,
+            }}
+          >
+            {msg}
+          </div>
+        ) : null}
 
         <button
-          disabled={loading}
-          className="mt-2 w-full rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2 shadow-lg shadow-blue-600/30 disabled:opacity-40"
           type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            marginTop: 12,
+            padding: "10px 12px",
+            borderRadius: 12,
+            border: "1px solid rgba(255,215,0,0.25)",
+            background: "rgba(255,215,0,0.14)",
+            color: "#FFD700",
+            cursor: loading ? "not-allowed" : "pointer",
+            fontWeight: 950,
+          }}
         >
-          {loading
-            ? "..."
-            : mode === "signin"
-            ? "Se connecter"
-            : "Créer mon compte"}
+          {loading ? "Envoi..." : "Recevoir un lien de connexion"}
         </button>
       </form>
-
-      <div className="text-[11px] text-gray-400 text-center mt-4">
-        {mode === "signin" ? (
-          <>
-            Pas de compte ?{" "}
-            <button
-              className="text-blue-400 hover:text-blue-300 underline"
-              onClick={() => {
-                setMode("signup");
-                setErrorMsg("");
-                setOkMsg("");
-              }}
-            >
-              Créer un compte
-            </button>
-          </>
-        ) : (
-          <>
-            Déjà un compte ?{" "}
-            <button
-              className="text-blue-400 hover:text-blue-300 underline"
-              onClick={() => {
-                setMode("signin");
-                setErrorMsg("");
-                setOkMsg("");
-              }}
-            >
-              Se connecter
-            </button>
-          </>
-        )}
-      </div>
     </div>
   );
 }
