@@ -21,6 +21,7 @@ export default function SignInUp() {
 
     try {
       setLoading(true);
+
       const redirectTo = `${window.location.origin}/`;
 
       const { error } = await supabase.auth.signInWithOtp({
@@ -32,8 +33,8 @@ export default function SignInUp() {
 
       setMsg("✅ Lien envoyé ! Ouvre ton email et clique sur le lien pour te connecter.");
     } catch (e) {
-      console.error("❌ signInWithOtp:", e);
-      setErr(e?.message || "Impossible d’envoyer le lien. Réessaie.");
+      console.error("❌ signInWithOtp error:", e);
+      setErr(e?.message || "Erreur: impossible d’envoyer le lien. Réessaie.");
     } finally {
       setLoading(false);
     }
@@ -44,14 +45,13 @@ export default function SignInUp() {
       <div style={{ fontSize: 20, fontWeight: 950 }}>DutyFree</div>
       <div style={{ marginTop: 6, opacity: 0.85 }}>Crée ton compte</div>
 
-      {/* SI TU NE VOIS PAS ÇA SUR VERCEL → TU N'AS PAS LE BON BUILD */}
+      {/* ✅ Si tu ne vois pas ça en prod, Vercel n'a pas pris ton dernier commit */}
       <div style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
-        BUILD: OTP-DIRECT-2025-12-29
+        BUILD: OTP-FIX-2025-12-29
       </div>
 
       <form onSubmit={handleSubmit} style={{ marginTop: 14 }}>
         <div style={{ fontSize: 12, opacity: 0.8 }}>Email</div>
-
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -68,13 +68,29 @@ export default function SignInUp() {
         />
 
         {err ? (
-          <div style={{ marginTop: 10, padding: 10, borderRadius: 12, background: "#fee2e2" }}>
+          <div
+            style={{
+              marginTop: 10,
+              padding: 10,
+              borderRadius: 12,
+              background: "#fee2e2",
+              whiteSpace: "pre-wrap",
+            }}
+          >
             ❌ {err}
           </div>
         ) : null}
 
         {msg ? (
-          <div style={{ marginTop: 10, padding: 10, borderRadius: 12, background: "#dcfce7" }}>
+          <div
+            style={{
+              marginTop: 10,
+              padding: 10,
+              borderRadius: 12,
+              background: "#dcfce7",
+              whiteSpace: "pre-wrap",
+            }}
+          >
             {msg}
           </div>
         ) : null}
@@ -88,12 +104,16 @@ export default function SignInUp() {
             padding: "10px 12px",
             borderRadius: 12,
             border: "1px solid rgba(0,0,0,0.15)",
-            cursor: loading ? "not-allowed" : "pointer",
             fontWeight: 900,
+            cursor: loading ? "not-allowed" : "pointer",
           }}
         >
           {loading ? "Envoi..." : "Recevoir mon lien"}
         </button>
+
+        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.7, lineHeight: 1.4 }}>
+          Sur mobile : ouvre le lien dans Safari/Chrome (évite le navigateur interne Gmail/Instagram).
+        </div>
       </form>
     </div>
   );
