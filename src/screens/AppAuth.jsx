@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabaseClient";
 
-// Screens
+// Screens (dans le même dossier)
 import Catalog from "./Catalog.jsx";
 import Cart from "./Cart.jsx";
 import Checkout from "./Checkout.jsx";
@@ -10,14 +10,14 @@ import MyRequests from "./MyRequests.jsx";
 import Travelers from "./Travelers.jsx";
 import Orders from "./Orders.jsx";
 
-// Components
+// Components (dans src/components)
 import StripeReturnHandler from "../components/StripeReturnHandler.jsx";
 import ResetTestSessionButton from "../components/ResetTestSessionButton.jsx";
 
 // Auth screen (OTP direct)
 import SignInUp from "../auth/SignInUp.jsx";
 
-// Context cart
+// Context (dans src/context)
 import { useCart } from "../context/CartContext.jsx";
 
 const LS = {
@@ -33,10 +33,13 @@ function getLS(key, fallback = "") {
     return fallback;
   }
 }
+
 function setLS(key, value) {
   try {
     localStorage.setItem(key, value);
-  } catch {}
+  } catch {
+    // ignore
+  }
 }
 
 const TABS = [
@@ -57,8 +60,12 @@ function TabButton({ active, children, onClick }) {
       style={{
         padding: "10px 12px",
         borderRadius: 12,
-        border: active ? "1px solid rgba(255,215,0,0.35)" : "1px solid rgba(255,255,255,0.08)",
-        background: active ? "rgba(255,215,0,0.12)" : "rgba(255,255,255,0.03)",
+        border: active
+          ? "1px solid rgba(255,215,0,0.35)"
+          : "1px solid rgba(255,255,255,0.08)",
+        background: active
+          ? "rgba(255,215,0,0.12)"
+          : "rgba(255,255,255,0.03)",
         color: active ? "#FFD700" : "rgba(255,255,255,0.85)",
         cursor: "pointer",
         fontWeight: 800,
@@ -83,21 +90,36 @@ function OnboardingCard({ onClose }) {
         boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 12,
+          alignItems: "flex-start",
+        }}
+      >
         <div>
-          <div style={{ fontSize: 16, fontWeight: 900, color: "#FFD700" }}>Comment ça marche (bêta) ✈️🛍️</div>
+          <div style={{ fontSize: 16, fontWeight: 900, color: "#FFD700" }}>
+            Comment ça marche (bêta) ✈️🛍️
+          </div>
+
           <div style={{ marginTop: 8, opacity: 0.9, lineHeight: 1.55 }}>
             <div style={{ marginTop: 6 }}>
-              <b>1)</b> Choisis un produit et crée une <b>demande</b> (ville + quantité + budget).
+              <b>1)</b> Choisis un produit et crée une <b>demande</b> (ville +
+              quantité + budget).
             </div>
             <div style={{ marginTop: 6 }}>
               <b>2)</b> Un <b>voyageur</b> accepte la demande.
             </div>
             <div style={{ marginTop: 6 }}>
-              <b>3)</b> Tu <b>paies</b>, le voyageur récupère l’article et vous organisez la <b>remise</b>.
+              <b>3)</b> Tu <b>paies</b>, le voyageur récupère l’article et vous
+              organisez la <b>remise</b>.
             </div>
+
             <div style={{ marginTop: 10, opacity: 0.8 }}>
-              Mode test : données locales (localStorage). Tu peux réinitialiser à tout moment.
+              Mode test : certaines actions peuvent être simulées. Les données
+              de test sont stockées sur cet appareil (localStorage). Tu peux
+              réinitialiser à tout moment.
             </div>
           </div>
         </div>
@@ -135,7 +157,11 @@ function ChatPlaceholder() {
     >
       <div style={{ fontSize: 16, fontWeight: 900 }}>Chat</div>
       <div style={{ marginTop: 8, opacity: 0.85, lineHeight: 1.5 }}>
-        MVP : chat simplifié dans <b>Mes demandes</b> et <b>Mes voyageurs</b>.
+        Le module chat temps réel est présent dans <code>src/chat</code> et{" "}
+        <code>src/screens</code>.
+        <br />
+        Pour le MVP, le chat simplifié est dans <b>Mes demandes</b> et{" "}
+        <b>Mes voyageurs</b> (via <code>requests.chat_log</code>).
       </div>
     </div>
   );
@@ -173,7 +199,9 @@ export default function AppAuth() {
       alive = false;
       try {
         sub?.subscription?.unsubscribe?.();
-      } catch {}
+      } catch {
+        // ignore
+      }
     };
   }, []);
 
@@ -185,14 +213,17 @@ export default function AppAuth() {
     return <SignInUp />;
   }
 
-  // ----- Ton app (connecté) -----
+  // ----- App connectée -----
   const cart = useCart();
   const clearCart = cart?.clearCart || (() => {});
 
   const [activeTab, setActiveTab] = useState("catalog");
   const [buyerName, setBuyerName] = useState(() => getLS(LS.buyerName, ""));
-  const [showOnboarding, setShowOnboarding] = useState(() => getLS(LS.onboardingSeen, "") !== "1");
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => getLS(LS.onboardingSeen, "") !== "1"
+  );
 
+  // Si le prénom change ailleurs (Catalog), on resynchronise
   useEffect(() => {
     const id = window.setInterval(() => {
       const v = getLS(LS.buyerName, "");
@@ -212,7 +243,18 @@ export default function AppAuth() {
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: 12, opacity: 0.75 }}>Connecté</div>
-          <div style={{ fontSize: 14, fontWeight: 900, color: "rgba(255,255,255,0.92)" }}>{displayName}</div>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 900,
+              color: "rgba(255,255,255,0.92)",
+            }}
+          >
+            {displayName}
+          </div>
+          <div style={{ fontSize: 11, opacity: 0.6 }}>
+            {user?.email || ""}
+          </div>
         </div>
 
         <ResetTestSessionButton
@@ -224,7 +266,7 @@ export default function AppAuth() {
         />
       </div>
     );
-  }, [buyerName, clearCart]);
+  }, [buyerName, clearCart, user?.email]);
 
   return (
     <div
@@ -238,9 +280,23 @@ export default function AppAuth() {
           "linear-gradient(180deg, #070B14 0%, #05070D 100%)",
       }}
     >
+      {/* ✅ BUILD STAMP (si tu ne le vois pas en prod, c'est pas le bon build) */}
+      <div style={{ marginBottom: 10, fontSize: 12, opacity: 0.8 }}>
+        BUILD: APPAUTH-2025-12-29-01
+      </div>
+
+      {/* Interception du retour Stripe au niveau global */}
       <StripeReturnHandler />
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14 }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 14,
+        }}
+      >
         <div>
           <div style={{ fontSize: 20, fontWeight: 950, letterSpacing: 0.2 }}>
             Dutyvia <span style={{ color: "#FFD700" }}>(Bêta)</span>
@@ -249,11 +305,14 @@ export default function AppAuth() {
             Marketplace Duty-Free — demandes acheteurs ↔ voyageurs
           </div>
         </div>
+
         {headerRight}
       </div>
 
+      {/* Onboarding (vu une fois) */}
       {showOnboarding ? <OnboardingCard onClose={closeOnboarding} /> : null}
 
+      {/* Tabs */}
       <div
         style={{
           marginTop: 16,
@@ -267,12 +326,17 @@ export default function AppAuth() {
         }}
       >
         {TABS.map((t) => (
-          <TabButton key={t.key} active={activeTab === t.key} onClick={() => setActiveTab(t.key)}>
+          <TabButton
+            key={t.key}
+            active={activeTab === t.key}
+            onClick={() => setActiveTab(t.key)}
+          >
             {t.label}
           </TabButton>
         ))}
       </div>
 
+      {/* Content */}
       <div style={{ marginTop: 12 }}>
         {activeTab === "catalog" && <Catalog />}
         {activeTab === "cart" && <Cart />}
@@ -283,8 +347,10 @@ export default function AppAuth() {
         {activeTab === "orders" && <Orders />}
       </div>
 
+      {/* Footer note */}
       <div style={{ marginTop: 18, opacity: 0.65, fontSize: 12 }}>
-        Bêta : données locales stockées sur cet appareil (localStorage).
+        Bêta : données locales stockées sur cet appareil (localStorage). Utilise
+        “Réinitialiser la session de test” si besoin.
       </div>
     </div>
   );
